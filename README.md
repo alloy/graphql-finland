@@ -10,14 +10,28 @@ all _want_ to use, but on the other hand it also means that we may need to spend
 about these problems and iterate. Seeing as we all strife to have backwards compatible schemas, it’s of great importance
 that we know of the various iterations that people have experimented with and what the outcome was.
 
-This is our story of working with errors.
+This is our story of thinking about and working with errors, thus far.
 
-## Exceptions vs User Errors
+## Errors vs errors
 
-First of all, I wanted to take a step back and talk about errors in general. There are 2 types of errors that we have to
-deal with:
+First of all, I wanted to take a step back and talk about errors in general. The nomenclature around these can get
+confusing, suffice to say that during this session we’ll talk about these two types:
 
-1. Errors that we expect may occu
+1. Errors that occurred during query execution that were unexpected and _could_ lead to corrupted data.
+
+   These could be due to hardware failures, such as running out of memory or disk space, network failures, or unexpected
+   upstream data etc.
+
+   When these occur, `graphql-js` will return `null` for the field that triggered the error and serialize the error into
+   the top-level ‘GraphQL errors’ list. Presumably other implementations follow this reference implementation.
+   (TODO: check specification)
+
+1. Exceptions to these are errors that are known to occur and are expected to be handled by the user. We’ll refer to
+   these as ‘exceptions’, going forward.
+
+   By default these are treated equally by `graphql-js` to other errors, if uncaught.
+
+## What is the problem we’re trying to solve?
 
 ## Possible solutions
 
