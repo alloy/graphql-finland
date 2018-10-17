@@ -6,10 +6,11 @@ community come-up with defining problems and experimenting with solutions for th
 about the location in the graph where errors occurred during execution were
 [added to the specification][spec-errors-locations].
 
-This is great in the sense that we still have the ability, as a community, to shape the future of a GraphQL spec that we
-all _want_ to use, but on the other hand it also means that we may need to spend significant amounts of time on thinking
-about these problems and iterating. Seeing as we all strive to have backwards compatible schemas, it’s of great
-importance that we know of the various iterations that people have experimented with and what the outcome was.
+This is great in the sense that we still have the ability, as a community, to shape the future of a GraphQL
+specification that we all _want_ to use, but on the other hand it also means that we may need to spend significant
+amounts of time on thinking about these problems and iterating. Seeing as we all strive to have backwards compatible
+schemas, it’s of great importance that we know of the various iterations that people have experimented with and what the
+outcome was.
 
 This is our story of thinking about and working with errors, thus far.
 
@@ -19,10 +20,10 @@ NOTE: Throughout this talk I’ll use ‘query execution’ to indicate executin
 
 ## Errors vs errors
 
-First of all, I wanted to take a step back and talk about errors in general. The nomenclature around these can get
+First of all, I want to take a step back and talk about errors in general. The nomenclature around these can get
 confusing, suffice to say that during this session we’ll talk about these two types:
 
-1. Errors that occurred during query execution that were unexpected and _could_ lead to corrupted data. We’ll refer to
+1. Errors that occur during query execution, that were unexpected, and _could_ lead to corrupted data. We’ll refer to
    these as (top-level) ‘GraphQL errors’, going forward.
 
    These could be due to hardware failures, such as running out of memory or disk space, network failures, or unexpected
@@ -34,7 +35,14 @@ confusing, suffice to say that during this session we’ll talk about these two 
 
    ```json
    {
-     data: { artwork: { artist: { name: "Vincent van Gogh", leftEarSize: null } } },
+     data: {
+       artwork: {
+         artist: {
+           name: "Vincent van Gogh",
+           leftEarSize: null
+         }
+       }
+     },
      errors: [
        {
          message: "An unexpected error occurred",
@@ -44,7 +52,7 @@ confusing, suffice to say that during this session we’ll talk about these two 
    }
    ```
 
-1. Exceptions to these are errors that are known to occur and are expected to be handled by the user of an API. We’ll
+1. Exceptions to these are errors that are _known_ to occur and are expected to be handled by the user of an API. We’ll
    refer to these as ‘exceptions’, going forward.
 
    By default these are treated equally by `graphql-js` to top-level GraphQL errors, if uncaught.
@@ -84,20 +92,20 @@ So how _do_ we model errors in such a way that they can be meaningful and in con
 
 ## Possible solutions
 
-### Top-level GraphQL errors and treating a complete response as unusable when such errors exist
+### Top-level GraphQL errors and treating an entire response as unusable when such errors exist
 
-Some clients, such as Apollo and Relay Classic, have made the decision to reject a response entirely by default if any
+Some clients, such as Apollo and Relay Classic, have made the decision to reject a response entirely, by default, if any
 top-level GraphQL errors exist. This is because clients can really only fully assume that the response data is
 incomplete, not wether or not your application could handle that case.
 
-This may be an ok solution when you’re starting out or all the requested data is part of one holistic view, but it
+This may be an ok solution when you’re starting out or all the requested data is part of a single holistic view, but it
 quickly breaks down when you want a little more than that.
 
 ### Top-level GraphQL errors with extra metadata
 
 GraphQL errors only have a single field in [the specification][spec-errors] to provide context around the cause of the
-error, which is the `message` field. However, [the specification][spec-response] also defines an `extensions` key, which
-may hold a map of freeform data for the schema implementors to extend the protocol however they see fit.
+error, which is the `message` field. However, [the specification][spec-response] also defines a top-level `extensions`
+key, which may hold a map of freeform data for the schema implementors to extend the protocol however they see fit.
 
 Apollo Server 2.0, for instance, [introduced standardized errors][apollo-server-errors] you can throw from your
 resolvers, which end up being serialized into the `extensions` map. An example they give is for bad user input:
@@ -128,7 +136,7 @@ const resolvers = {
 ```
 
 Seeing as these extensions are freeform, however, this builds an **implicit** contract between the server and client
-that then needs to be abstracted away by additional client code, which is unfortunate, when you think about it, because
+that then needs to be abstracted away by additional client code. This is unfortunate, when you think about it, because
 GraphQL is meant to explicitly express shapes of data.
 
 The Apollo team acknowledges this by adding:
@@ -155,11 +163,11 @@ type UpdateArtworkMutationResponse {
 ```
 
 Here there’s a boolean that indicates success, an extra message that sheds context on the situation when a failure
-occurs, and finally the `user` that an update was attempted to be made to.
+occurs, and finally the `artwork` that an update was attempted to be made to.
 
 Adding these fields to the same namespace makes sense when we’re thinking of the failure case, but what about the
 success case? Do we really need a `success` boolean to indicate that updates to the `artwork` were made? What purpose
-serves the `message` field, other than possibly being a sign of a very friendly schema that sends you happy messages?
+serves the `message` field, other than possibly being a sign of an overly positive schema that sends you happy messages?
 
 Finally, this approach only really works for mutations, as they get their own root type to start a query from. It would
 be hard to imagine how to apply this to queries.
@@ -185,7 +193,7 @@ can be applied to queries too:
 
 ```graphql
 type PublishedArtworkNotification {
-  artwork: Artwork!
+  artwork: Artwork
 }
 
 type PublishedArtworkNotificationsPayload {
@@ -200,8 +208,13 @@ type Query {
 
 Neat.
 
-If you don’t control the server schema and are using a client that can extend a schema, you could try to retrofit these
-error fields into the schema on the client side based on the top-level GraphQL errors, as shown [here][retrofit-errors].
+However, and this may just be our use-case, we don’t have partial data at these stages. We’ve either resolved the data
+or we have an error. Hence, this approach would mean we’d always have an unneeded `null` field, which pollutes the
+namespace of the type unnecessarily.
+
+Side-note: if you don’t control the server schema, and are using a client that can extend a server schema on the client,
+you could try to retrofit top-level GraphQL errors to these suggested error fields into the schema where they occurred
+based on the error `path`, as shown [here][retrofit-errors].
 
 ## Recap
 
@@ -222,8 +235,8 @@ The benefits are:
 
 * You can further model the exception in an explicit and introspect-able way.
 
-  For example, in the case of an upstream HTTP failure, your exception type could include an integer status-code field
-  and document it as such.
+  For example, in the case of an HTTP failure to an upstream service, your exception type could include an integer
+  status-code field and document it as such.
 
   ```graphql
   type Artwork {
@@ -259,7 +272,7 @@ The benefits are:
 
   ```graphql
   type Artist {
-    artworksOrErrors: [ArtworkOrError!]!
+    artworksOrErrors: [ArtworkOrError]
   }
 
   type Query {
@@ -290,8 +303,8 @@ The benefits are:
   }
   ```
 
-* All fields will always be captured in the single `artworkOrError` field and if no information about the error is
-  needed you simply don’t query for it and get back `null` instead.
+* All fields will always be captured in the single `artworkOrError` field _or_, if no information about the error is
+  needed, you simply don’t query for it and get back `null` instead.
 
   ```graphql
   query {
@@ -364,9 +377,7 @@ query {
     ... on Artwork {
       title
     }
-    ... on Error {
-      ...GenericErrorComponent
-    }
+    ...GenericErrorComponent
   }
 }
 
@@ -376,20 +387,20 @@ fragment GenericErrorComponent on Error {
 ```
 
 For the record, we have _not_ yet put these interfaces into production, so the nomenclature is not set in stone yet and
-I’d love to hear your input on this. Is `Error` _too_ generic to use as the base error type? Is there a nicer pattern
-to avoid having to suffix concrete types of an error interface with `Type`?
+I’d love to hear your input on this. Is `Error` _too_ generic to use as the base error type? Is there a nicer naming
+pattern that would allow us to avoid having to suffix concrete types of an error interface with `...Type`?
 
-Side-note, there’s [an RFC][implements-interface-rfc] to the GraphQL specification that would make it possible to have
-interface implement other interfaces, thus removing the need to keep repeating the fields of super-sets. This RFC has
-recently been moved to being a draft, yay!
+Side-note: there’s [an RFC][implements-interface-rfc] to the GraphQL specification that would make it possible to have
+interfaces implement other interfaces, thus removing the need to keep repeating the fields of super-sets. This RFC has
+recently been moved to the draft stage, yay!
 
 ### Naming
 
 As you may have noticed, we’re calling these fields `something` _or_ `error`. We are mostly doing this to stay backwards
-compatible with out existing schema. While we could certainly add exception types to existing union fields, we can’t
+compatible with our existing schema. While we could certainly add exception types to existing union fields, we can’t
 change a single type field into a union type field without breaking compatibility.
 
-Instead we now may have 2 versions of a given field:
+Instead we may now have 2 versions of a given field:
 
 * one with the single type field which is nullable, in case an exception occurred
 
@@ -434,12 +445,12 @@ in the community. For instance, many schemas provide 2 ways to retrieve lists:
     node: Artwork
   }
 
-  type ArtworkConnection {
+  type ArtworksConnection {
     edges: [ArtworkEdge]
   }
 
   query {
-    allArtworks: ArtworkConnection
+    artworksConnection: ArtworksConnection
   }
   ```
 
@@ -448,8 +459,8 @@ while.
 
 ### Downside of using a union
 
-One notable downside is that GraphQL scalar types can _not_ be included in unions, [right now][scalars-in-unions]. Thus,
-if you have scalar fields that could lead to exceptions, you will have to ‘box’ those in object types.
+One notable downside is that GraphQL scalar types can _not_ be included in unions. Thus, if you have scalar fields that
+could lead to exceptions, you will have to ‘box’ those in object types.
 
 ```graphql
 type ArtworkPurchasableBox {
@@ -459,12 +470,16 @@ type ArtworkPurchasableBox {
 union ArtworkPurchasableOrError = ArtworkPurchasableBox | HTTPError
 
 type Artwork {
-  currentlyPurchasableOrError: ArtworkPurchasableOrError!
+  currentlyPurchasableOrError: ArtworkPurchasableOrError
 }
 ```
 
 This is definitely a case where the pattern of defining 2 fields, one with and one without exception types, comes in
 handy. Having to always query through the box type is inelegant, to put it softly.
+
+Side-note: there actually is [an open RFC][scalars-in-unions] to the specification to allow scalars in unions, but it’s
+still in stage 0 and is in need of a champion in order to proceed. We may end up trying to do so, based on our actual
+experiences with these cases where they may need to be boxed.
 
 ### Show example of factory code that produces both single and union typed fields
 
@@ -477,7 +492,7 @@ TODO
 [spec-errors]: https://facebook.github.io/graphql/draft/#sec-Errors
 [spec-response]: https://facebook.github.io/graphql/draft/#sec-Response-Format
 [spec-errors-locations]: https://github.com/facebook/graphql/pull/230
-[apollo-mutations-responses]: https://www.apollographql.com/docs/guides/schema-design.html#mutation-responses
+[apollo-mutation-responses]: https://www.apollographql.com/docs/guides/schema-design.html#mutation-responses
 [error-fields]: https://itnext.io/the-definitive-guide-to-handling-graphql-errors-e0c58b52b5e1
 [retrofit-errors]: https://github.com/facebook/relay/issues/1913#issuecomment-358636018
 [apollo-server-errors]: https://blog.apollographql.com/full-stack-error-handling-with-graphql-apollo-5c12da407210
