@@ -481,13 +481,30 @@ Side-note: there actually is [an open RFC][scalars-in-unions] to the specificati
 still in stage 0 and is in need of a champion in order to proceed. We may end up trying to do so, based on our actual
 experiences with these cases where they may need to be boxed.
 
+### Example of how we consume the errors in our clients
+
+TODO
+
 ### Show example of factory code that produces both single and union typed fields
 
 TODO
 
-### Example of how we consume the errors in our clients
+## Final thoughts
 
-TODO
+As stated before, we having only recently begun rolling out these changes into our production schema. However, much
+thought and experimentation has gone into this to ensure we will be able to address all of _our_ needs, at least.
+
+I would love to hear other people’s thoughts on this and definitely feedback if they try to adopt it themselves. As a
+community we should openly iterate together, as much as possible, as we try to make the future of GraphQL a great one
+and put legit questions to ‘REST’ ;)
+
+For now, I’ll leave you with this message from some internet ‘rando’:
+
+> @alloy That diff makes a lot of sense to me. I've also seen user errors as a field on the mutation result, but I like
+> that union makes it explicit that there was either success or failure and in the case of failure provides rich
+> information that's in your app's domain.
+
+-- [Lee Byron](https://twitter.com/leeb/status/1020054709694943232)
 
 [spec-errors]: https://facebook.github.io/graphql/draft/#sec-Errors
 [spec-response]: https://facebook.github.io/graphql/draft/#sec-Response-Format
