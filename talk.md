@@ -2,13 +2,14 @@
 
 GraphQL is still in its early stages and thus these are very exciting times, indeed! Traditionally the GraphQL team has
 taken the approach of defining the bare minimum in the specification that was deemed needed and otherwise letting the
-community come-up with defining problems and experiment with solutions for those. One such example is how metadata about
-the origins of errors that occurred during execution were [added to the specification][spec-errors-locations].
+community come-up with defining problems and experimenting with solutions for those. One such example is how metadata
+about the location in the graph where errors occurred during execution were
+[added to the specification][spec-errors-locations].
 
 This is great in the sense that we still have the ability, as a community, to shape the future of a GraphQL spec that we
 all _want_ to use, but on the other hand it also means that we may need to spend significant amounts of time on thinking
-about these problems and iterate. Seeing as we all strife to have backwards compatible schemas, it’s of great importance
-that we know of the various iterations that people have experimented with and what the outcome was.
+about these problems and iterating. Seeing as we all strive to have backwards compatible schemas, it’s of great
+importance that we know of the various iterations that people have experimented with and what the outcome was.
 
 This is our story of thinking about and working with errors, thus far.
 
@@ -51,7 +52,7 @@ confusing, suffice to say that during this session we’ll talk about these two 
 We will **not** be speaking about errors that occur _outside_ of query execution, such as network failures reaching the
 GraphQL server, parsing a syntactically incorrect document, or passing variables that don’t satisfy the type-system; as
 these will all lead to a query being rejected wholesale and are solve-able using traditional means, such as a `4xx` HTTP
-status code.
+status code or `5xx` in some cases.
 
 ## What is the problem we’re trying to solve?
 
@@ -209,7 +210,7 @@ So to quickly recap, ideally we want a solution to:
 * utilize GraphQL to explicitly describe the error data
 * present the error data exactly where the error occurred in the schema
 * work for both mutations and queries
-* be concise and encourage ‘clean’ typed; that is, no pollution of namespaces with fields only needed in some cases
+* be concise and encourage ‘clean’ types; that is, no pollution of namespaces with fields only needed in some cases
 
 ### Make exceptions first-class citizens of your schema
 
