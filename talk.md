@@ -487,9 +487,116 @@ Side-note: there actually is [an open RFC][scalars-in-unions] to the specificati
 still in stage 0 and is in need of a champion in order to proceed. We may end up trying to do so, based on our actual
 experiences with these cases where they may need to be boxed.
 
-### Example of how we consume the errors in our clients
+### Example of how we consume query errors
 
-TODO
+```tsx
+import { OrderStatus_order } from "__generated__/OrderStatus_order.graphql"
+import React from "react"
+import { createFragmentContainer, graphql } from "react-relay"
+
+interface Props {
+  order: OrderStatus_order
+}
+
+const OrderStatus: React.SFC<Props> = ({ order: orderStatusOrError }) =>
+  orderStatusOrError.__typename === "OrderStatus" ? (
+    <div>
+      {orderStatusOrError.deliveryDispatched
+        ? "Your order has been dispatched."
+        : "Your order has not been dispatched yet."}
+    </div>
+  ) : (
+    <div className="error">
+      {orderStatusOrError.code === "unpublished"
+        ? "Please contact gallery services."
+        : `An unexpected error occurred: ${orderStatusOrError.message}`}
+    </div>
+  )
+
+export const OrderStatusContainer = createFragmentContainer(
+  OrderStatus,
+  graphql`
+    fragment OrderStatus_order on Order {
+      orderStatusOrError {
+        __typename
+        ... on OrderStatus {
+          deliveryDispatched
+        }
+        ... on OrderError {
+          message
+          code
+        }
+      }
+    }
+  `
+)
+```
+
+### Example of how we consume mutation errors
+
+```tsx
+import { SubmitOrder_order } from "__generated__/SubmitOrder_order.graphql"
+import { SubmitOrderMutation } from "__generated__/SubmitOrderMutation.graphql"
+import { Router } from "found-relay"
+import React from "react"
+import { commitMutation, createFragmentContainer, graphql, RelayProp } from "react-relay"
+
+interface Props {
+  order: SubmitOrder_order
+  relay: RelayProp
+  router: Router
+}
+
+const SubmitOrder: React.SFC<Props> = props => (
+  <button
+    onClick={() => {
+      commitMutation<SubmitOrderMutation>(props.relay.environment, {
+        mutation: graphql`
+          mutation SubmitOrderMutation($input: SubmitOrder!) {
+            submitOrder(input: $input) {
+              orderStatusOrError {
+                __typename
+                ... on OrderStatus {
+                  submitted
+                }
+                ... on OrderError {
+                  message
+                  code
+                }
+              }
+            }
+          }
+        `,
+        variables: { input: { orderID: props.order.id } },
+        onCompleted: ({ submitOrder: { orderStatusOrError } }, errors) => {
+          if (orderStatusOrError.__typename === "OrderStatus") {
+            props.router.push(
+              `/orders/${props.order.id}/${
+                orderStatusOrError.submitted ? "submitted" : "pending"
+              }`
+            )
+          } else {
+            alert(
+              orderStatusOrError.code === "unpublished"
+                ? "Please contact gallery services."
+                : `An unexpected error occurred: ${orderStatusOrError.message}`
+            )
+          }
+        },
+      })
+    }}
+  />
+)
+
+export const SubmitOrderContainer = createFragmentContainer(
+  SubmitOrder,
+  graphql`
+    fragment SubmitOrder_order on Order {
+      id
+    }
+  `
+)
+```
 
 ### Show example of factory code that produces both single and union typed fields
 
