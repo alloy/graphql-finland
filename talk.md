@@ -169,8 +169,8 @@ Adding these fields to the same namespace makes sense when we’re thinking of t
 success case? Do we really need a `success` boolean to indicate that updates to the `artwork` were made? What purpose
 serves the `message` field, other than possibly being a sign of an overly positive schema that sends you happy messages?
 
-Finally, this approach only really works for mutations, as they get their own root type to start a query from. It would
-be hard to imagine how to apply this to queries.
+Finally, this approach only really works for mutations, as their return type acts as a distinct root type to start a
+query from. It would be hard to imagine how to apply this to queries.
 
 ### Make error metadata part of schema as separate field
 
@@ -220,10 +220,10 @@ based on the error `path`, as shown [here][retrofit-errors].
 
 So to quickly recap, ideally we want a solution to:
 
-* utilize GraphQL to explicitly describe the error data
-* present the error data exactly where the error occurred in the schema
-* work for both mutations and queries
-* be concise and encourage ‘clean’ types; that is, no pollution of namespaces with fields only needed in some cases
+* Use GraphQL: Utilize GraphQL to explicitly describe the error data.
+* In context: Present the error data exactly where the error occurred in the schema.
+* All operations: Work for both mutations and queries.
+* Explicit status: Be concise and encourage ‘clean’ types; that is, no pollution of namespaces with fields only needed in some cases.
 
 ### Make exceptions first-class citizens of your schema
 
@@ -337,7 +337,7 @@ interface HTTPError {
   statusCode: Int!
 }
 
-type HTTPErrorType implements Error, HTTPError {
+type HTTPErrorType implements Error & HTTPError {
   message: String!
   statusCode: Int!
 }
@@ -378,11 +378,17 @@ query {
       title
     }
     ...GenericErrorComponent
+    ...GenericHTTPErrorComponent
   }
 }
 
 fragment GenericErrorComponent on Error {
   message
+}
+
+fragment GenericErrorComponent on HTTPError {
+  message
+  statusCode
 }
 ```
 
@@ -391,10 +397,10 @@ I’d love to hear your input on this. Is `Error` _too_ generic to use as the ba
 pattern that would allow us to avoid having to suffix concrete types of an error interface with `...Type`?
 
 Side-note: there’s [an RFC][implements-interface-rfc] to the GraphQL specification that would make it possible to have
-interfaces implement other interfaces, thus removing the need to keep repeating the fields of super-sets. This RFC has
-recently been moved to the draft stage, yay!
+interfaces implement other interfaces, thus removing the need to keep repeating the fields of super-interfaces. This RFC
+has recently been moved to the draft stage, yay!
 
-### Naming
+### Field naming
 
 As you may have noticed, we’re calling these fields `something` _or_ `error`. We are mostly doing this to stay backwards
 compatible with our existing schema. While we could certainly add exception types to existing union fields, we can’t
@@ -433,7 +439,7 @@ in the community. For instance, many schemas provide 2 ways to retrieve lists:
 * one as an immediate list:
 
   ```graphql
-  query {
+  type Query {
     artworks: [artwork]
   }
   ```
@@ -449,7 +455,7 @@ in the community. For instance, many schemas provide 2 ways to retrieve lists:
     edges: [ArtworkEdge]
   }
 
-  query {
+  type Query {
     artworksConnection: ArtworksConnection
   }
   ```
