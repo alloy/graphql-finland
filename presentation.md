@@ -21,7 +21,9 @@
 
 ----
 
-![fit](images/spec-errors-locations.png)
+# Still early days
+
+![right, fit](images/spec-errors-locations.png)
 
 ^
 - Error path is example
@@ -115,29 +117,9 @@
 
 ----
 
-#### GraphQL Errors
+# GraphQL Errors
 
-[.text: alignment(left)]
-[.code-highlight: 6, 11-14]
-
-```javascript
-{
-  data: {
-    artwork: {
-      artist: {
-        name: "Vincent van Gogh",
-        leftEarSize: null
-      }
-    }
-  },
-  errors: [
-    {
-      message: "An unexpected error occurred",
-      path: ["artwork", "artist", "leftEarSize"]
-    }
-  ]
-}
-```
+![right, fit](code/grapqh-response-with-errors.png)
 
 ^
 - field resolves to null
@@ -191,21 +173,27 @@
 
 ----
 
-![fit](images/partial-data-unrelated.png)
+# Partial data
+
+![right, fit](images/partial-data-unrelated.png)
 
 ^
 - Unrelated components
 
 ----
 
-![fit](images/partial-data-unrelated-annotated.png)
+# Partial data
+
+![right, fit](images/partial-data-unrelated-annotated.png)
 
 ^
 - Unrelated components
 
 ----
 
-![fit](images/partial-data-list.png)
+# Partial data
+
+![right, fit](images/partial-data-list.png)
 
 ^
 - Part of list
@@ -213,7 +201,9 @@
 
 ----
 
-![fit](images/partial-data-list-annotated.png)
+# Partial data
+
+![right, fit](images/partial-data-list-annotated.png)
 
 ^
 - Part of list
@@ -229,7 +219,9 @@
 
 ----
 
-![fit](images/mutation-validation-error.png)
+### Communicate error
+
+![right, fit](images/mutation-validation-error.png)
 
 ^
 - Mutation validation errors
@@ -283,29 +275,10 @@ _https://u.nu/r5-2_
 
 ----
 
-#### GraphQL Errors with metadata
+### GraphQL Errors
+### with metadata
 
-[.text: alignment(left)]
-
-```js
-import { UserInputError } from 'apollo-server';
-
-const resolvers = {
-  Query: {
-    events(root, { zipCode }) {
-      if (!isValidZipCode(zipCode)) {
-        throw new UserInputError(
-          'Failed to get events due to validation errors',
-          { validationErrors: {
-            zipCode: 'This is not a valid zipcode'
-          }}
-        );
-      }
-      return getEventsByZipcode(zipCode);
-    }
-  }
-}
-```
+![right, fit](code/graphql-errors-with-metadata.png)
 
 ^
 - eg bad input
@@ -348,17 +321,10 @@ _https://u.nu/th7y_
 
 ----
 
-#### Extra (mutation) error fields
+#### Extra (mutation)
+#### error fields
 
-[.text: alignment(left)]
-
-```graphql
-type UpdateArtworkMutationResponse {
-  success: Boolean!
-  message: String!
-  artwork: Artwork
-}
-```
+![right, fit](code/extra-mutation-error-fields.png)
 
 ^
 - bool for status
@@ -367,17 +333,10 @@ type UpdateArtworkMutationResponse {
 
 ----
 
-#### Extra (mutation) error fields
+#### Extra (mutation)
+#### error fields
 
-[.text: alignment(left)]
-
-```graphql
-type UpdateArtworkMutationResponse {
-  success: Boolean!
-  message: String!
-  artwork: Artwork
-}
-```
+![right, fit](code/extra-mutation-error-fields.png)
 
 ^
 - adding here makes sense
@@ -412,20 +371,10 @@ _https://u.nu/-3pw_
 
 ----
 
-#### Extra error field & type
+### Extra error
+### field & type
 
-[.text: alignment(left)]
-
-```graphql
-type GenericError {
-  message: String!
-}
-
-type UpdateArtworkMutationResponse {
-  error: GenericError
-  artwork: Artwork
-}
-```
+![right, fit](code/extra-error-field-and-type-1.png)
 
 ^
 - when error != null, failure
@@ -433,25 +382,10 @@ type UpdateArtworkMutationResponse {
 
 ----
 
-#### Extra error field & type
+### Extra error
+### field & type
 
-[.text: alignment(left)]
-
-```graphql
-type PublishedArtworkNotification {
-  artwork: Artwork
-}
-
-type PublishedArtworkNotificationsPayload {
-  error: GenericError
-  notifications: [PublishedArtworkNotification]
-}
-
-type Query {
-  publishedArtworkNotificationsPayload:
-    PublishedArtworkNotificationsPayload!
-}
-```
+![right, fit](code/extra-error-field-and-type-2.png)
 
 ^
 - also useable on queries
@@ -548,37 +482,10 @@ be concise and encourage ‘clean’ types; that is, no pollution of namespaces 
 
 ----
 
-#### Exceptions as first-class citizens
+#### Exceptions as
+#### first-class citizens
 
-[.text: alignment(left)]
-
-```graphql
-type Artwork {
-  title: String!
-}
-
-type HTTPError {
-  message: String!
-  statusCode: Int!
-}
-
-union ArtworkOrError = Artwork | HTTPError
-
-type Query {
-  artworkOrError(id: ID!): ArtworkOrError
-}
-
-query {
-  artworkOrError("mona-lisa") {
-    ... on Artwork {
-      title
-    }
-    ... on HTTPError {
-      statusCode
-    }
-  }
-}
-```
+![right, fit](code/exceptions-as-first-class-citizens-1.png)
 
 ^
 - model explicit
@@ -589,66 +496,31 @@ query {
 
 ----
 
-#### Exceptions as first-class citizens
+#### Exceptions as
+#### first-class citizens
 
-[.text: alignment(left)]
-
-```graphql
-type Artist {
-  artworksOrErrors: [ArtworkOrError]
-}
-
-type Query {
-  artist(id: ID!): Artist
-}
-
-query {
-  artist("leonardo-da-vinci") {
-    artworksOrErrors {
-      ... on Artwork {
-        title
-      }
-      ... on HTTPError {
-        statusCode
-      }
-    }
-  }
-}
-```
+![right, fit](code/exceptions-as-first-class-citizens-2.png)
 
 ^
 - in context
 
 ----
 
-#### Exceptions as first-class citizens
+#### Exceptions as
+#### first-class citizens
 
-[.text: alignment(left)]
-
-```graphql
-type UpdateArtworkMutationResponse {
-  artworkOrError: ArtworkOrError
-}
-```
+![right, fit](code/exceptions-as-first-class-citizens-3.png)
 
 ^
 - works for all operations
 
 ----
 
-#### Exceptions as first-class citizens
+#### Exceptions as
+#### first-class citizens
 
-[.text: alignment(left)]
+![right, fit](code/exceptions-as-first-class-citizens-4.png)
 
-```graphql
-query {
-  artworkOrError("mona-lisa") {
-    ... on Artwork {
-      title
-    }
-  }
-}
-```
 
 ^
 - single field
@@ -669,34 +541,7 @@ query {
 
 # Types
 
-[.text: alignment(left)]
-[.code-highlight: 19, 22]
-
-```graphql
-interface Error {
-  message: String!
-}
-
-interface HTTPError {
-  message: String!
-  statusCode: Int!
-}
-
-type HTTPErrorType implements Error & HTTPError {
-  message: String!
-  statusCode: Int!
-}
-
-type Artwork {
-  title: String!
-}
-
-union ArtworkOrError = Artwork | HTTPErrorType
-
-type Query {
-  artworkOrError(id: ID!): ArtworkOrError
-}
-```
+![right, fit](code/how-we-use-it-types-1.png)
 
 ^
 - as shown before
@@ -706,34 +551,7 @@ type Query {
 
 # Types
 
-[.text: alignment(left)]
-[.code-highlight: 1-10]
-
-```graphql
-interface Error {
-  message: String!
-}
-
-interface HTTPError {
-  message: String!
-  statusCode: Int!
-}
-
-type HTTPErrorType implements Error & HTTPError {
-  message: String!
-  statusCode: Int!
-}
-
-type Artwork {
-  title: String!
-}
-
-union ArtworkOrError = Artwork | HTTPErrorType
-
-type Query {
-  artworkOrError(id: ID!): ArtworkOrError
-}
-```
+![right, fit](code/how-we-use-it-types-2.png)
 
 ^
 - additional interfaces
@@ -743,21 +561,7 @@ type Query {
 
 # Types
 
-[.text: alignment(left)]
-
-```graphql
-query {
-  artworkOrError("mona-lisa") {
-    ... on Artwork {
-      title
-    }
-    ... on HTTPError {
-      message
-      statusCode
-    }
-  }
-}
-```
+![right, fit](code/how-we-use-it-types-3.png)
 
 ^
 still query as shown before
@@ -766,28 +570,7 @@ still query as shown before
 
 # Types
 
-[.text: alignment(left)]
-
-```graphql
-query {
-  artworkOrError("mona-lisa") {
-    ... on Artwork {
-      title
-    }
-    ...GenericErrorComponent
-    ...GenericHTTPErrorComponent
-  }
-}
-
-fragment GenericErrorComponent on Error {
-  message
-}
-
-fragment GenericErrorComponent on HTTPError {
-  message
-  statusCode
-}
-```
+![right, fit](code/how-we-use-it-types-4.png)
 
 ^
 clients can now have generic components
@@ -796,34 +579,7 @@ clients can now have generic components
 
 # Types
 
-[.text: alignment(left)]
-[.code-highlight: 1, 10]
-
-```graphql
-interface Error {
-  message: String!
-}
-
-interface HTTPError {
-  message: String!
-  statusCode: Int!
-}
-
-type HTTPErrorType implements Error & HTTPError {
-  message: String!
-  statusCode: Int!
-}
-
-type Artwork {
-  title: String!
-}
-
-union ArtworkOrError = Artwork | HTTPErrorType
-
-type Query {
-  artworkOrError(id: ID!): ArtworkOrError
-}
-```
+![right, fit](code/how-we-use-it-types-5.png)
 
 ^
 - no interfaces in prod yet
@@ -860,15 +616,7 @@ _Side-note: https://u.nu/c1ye_
 
 # Field naming
 
-[.text: alignment(left)]
-
-```graphql
-query {
-  artwork("mona-lisa") {
-    title
-  }
-}
-```
+![right, fit](code/how-we-use-it-field-naming-1.png)
 
 ^
 one with single nullable type
@@ -877,20 +625,7 @@ one with single nullable type
 
 # Field naming
 
-[.text: alignment(left)]
-
-```graphql
-query {
-  artworkOrError("mona-lisa") {
-    ... on Artwork {
-      title
-    }
-    ... on HTTPError {
-      statusCode
-    }
-  }
-}
-```
+![right, fit](code/how-we-use-it-field-naming-2.png)
 
 ^
 another with error union type
@@ -899,14 +634,7 @@ another with error union type
 
 # Field naming
 
-[.text: alignment(left)]
-
-```graphql
-type Query {
-  artworks: [artwork]
-  artworksConnection: ArtworksConnection
-}
-```
+![right, fit](code/how-we-use-it-field-naming-3.png)
 
 ^
 - slightly unfortunate re clean design
@@ -915,21 +643,9 @@ type Query {
 
 ----
 
-# Downside of union
+### Downside of union
 
-[.text: alignment(left)]
-
-```graphql
-type ArtworkPurchasableBox {
-  value: Boolean!
-}
-
-union ArtworkPurchasableOrError = ArtworkPurchasableBox | HTTPError
-
-type Artwork {
-  currentlyPurchasableOrError: ArtworkPurchasableOrError
-}
-```
+![right, fit](code/how-we-use-it-downside-of-union.png)
 
 ^
 - notable downside
@@ -938,21 +654,9 @@ type Artwork {
 
 ----
 
-# Downside of union
+### Downside of union
 
-[.text: alignment(left)]
-
-```graphql
-type ArtworkPurchasableBox {
-  value: Boolean!
-}
-
-union ArtworkPurchasableOrError = ArtworkPurchasableBox | HTTPError
-
-type Artwork {
-  currentlyPurchasableOrError: ArtworkPurchasableOrError
-}
-```
+![right, fit](code/how-we-use-it-downside-of-union.png)
 
 ^
 - useful that we have 2 fields
@@ -974,105 +678,13 @@ _Side-note: https://u.nu/c29p_
 
 #### Example of query usage
 
-[.text: alignment(left)]
-
-```javascript
-import { OrderStatus_order } from "__generated__/OrderStatus_order.graphql"
-import { createFragmentContainer, graphql } from "react-relay"
-
-interface Props { order: OrderStatus_order }
-
-const OrderStatus: React.SFC<Props> = ({ order: orderStatusOrError }) =>
-  orderStatusOrError.__typename === "OrderStatus" ? (
-    <div>
-      {orderStatusOrError.deliveryDispatched
-        ? "Your order has been dispatched."
-        : "Your order has not been dispatched yet."}
-    </div>
-  ) : (
-    <div className="error">
-      {orderStatusOrError.code === "unpublished"
-        ? "Please contact gallery services."
-        : `An unexpected error occurred: ${orderStatusOrError.message}`}
-    </div>
-  )
-
-export const OrderStatusContainer = createFragmentContainer(
-  OrderStatus,
-  graphql`
-    fragment OrderStatus_order on Order {
-      orderStatusOrError {
-        __typename
-        ... on OrderStatus {
-          deliveryDispatched
-        }
-        ... on OrderError {
-          message
-          code
-        }
-      }
-    }
-  `
-)
-```
+![right, fit](code/example-of-usage-1.png)
 
 ----
 
 #### Example of mutation usage
 
-[.text: alignment(left)]
-
-```javascript
-import { SubmitOrder_order } from "__generated__/SubmitOrder_order.graphql"
-import { SubmitOrderMutation } from "__generated__/SubmitOrderMutation.graphql"
-import { Router } from "found-relay"
-import { commitMutation, createFragmentContainer, graphql, RelayProp } from "react-relay"
-
-interface Props { order: SubmitOrder_order, relay: RelayProp, router: Router }
-
-const SubmitOrder: React.SFC<Props> = props => (
-  <button
-    onClick={() => {
-      commitMutation<SubmitOrderMutation>(props.relay.environment, {
-        mutation: graphql`
-          mutation SubmitOrderMutation($input: SubmitOrder!) {
-            submitOrder(input: $input) {
-              orderStatusOrError {
-                __typename
-                ... on OrderStatus {
-                  submitted
-                }
-                ... on OrderError {
-                  message
-                  code
-                }
-              }
-            }
-          }
-        `,
-        variables: { input: { orderID: props.order.id } },
-        onCompleted: ({ submitOrder: { orderStatusOrError } }, errors) => {
-          if (orderStatusOrError.__typename === "OrderStatus") {
-            props.router.push(
-              `/orders/${props.order.id}/${
-                orderStatusOrError.submitted ? "submitted" : "pending"
-              }`
-            )
-          } else {
-            alert(
-              orderStatusOrError.code === "unpublished"
-                ? "Please contact gallery services."
-                : `An unexpected error occurred: ${orderStatusOrError.message}`
-            )
-          }
-        },
-      })
-    }}
-  />
-)
-
-export const SubmitOrderContainer = createFragmentContainer(…)
-```
+![right, fit](code/example-of-usage-2.png)
 
 ----
 
@@ -1124,7 +736,11 @@ export const SubmitOrderContainer = createFragmentContainer(…)
 
 ----
 
-![fit](images/tweet-from-leeb.png)
+### **@alloy**
+### **artsy.net**
+#### https://github.com/alloy/graphql-finland
+
+![right, fit](images/tweet-from-leeb.png)
 
 ^
 - leave you with message from internet rando
