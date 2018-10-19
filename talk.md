@@ -382,7 +382,7 @@ fragment GenericErrorComponent on Error {
   message
 }
 
-fragment GenericErrorComponent on HTTPError {
+fragment GenericHTTPErrorComponent on HTTPError {
   message
   statusCode
 }
@@ -436,7 +436,7 @@ in the community. For instance, many schemas provide 2 ways to retrieve lists:
 
   ```graphql
   type Query {
-    artworks: [artwork]
+    artworks: [Artwork]
   }
   ```
 
