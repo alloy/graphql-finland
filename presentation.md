@@ -440,7 +440,8 @@ type PublishedArtworkNotificationsPayload {
 }
 
 type Query {
-  publishedArtworkNotificationsPayload: PublishedArtworkNotificationsPayload!
+  publishedArtworkNotificationsPayload:
+    PublishedArtworkNotificationsPayload!
 }
 ```
 
@@ -969,12 +970,9 @@ _Side-note: https://u.nu/c29p_
 
 ```javascript
 import { OrderStatus_order } from "__generated__/OrderStatus_order.graphql"
-import React from "react"
 import { createFragmentContainer, graphql } from "react-relay"
 
-interface Props {
-  order: OrderStatus_order
-}
+interface Props { order: OrderStatus_order }
 
 const OrderStatus: React.SFC<Props> = ({ order: orderStatusOrError }) =>
   orderStatusOrError.__typename === "OrderStatus" ? (
@@ -1020,14 +1018,9 @@ export const OrderStatusContainer = createFragmentContainer(
 import { SubmitOrder_order } from "__generated__/SubmitOrder_order.graphql"
 import { SubmitOrderMutation } from "__generated__/SubmitOrderMutation.graphql"
 import { Router } from "found-relay"
-import React from "react"
 import { commitMutation, createFragmentContainer, graphql, RelayProp } from "react-relay"
 
-interface Props {
-  order: SubmitOrder_order
-  relay: RelayProp
-  router: Router
-}
+interface Props { order: SubmitOrder_order, relay: RelayProp, router: Router }
 
 const SubmitOrder: React.SFC<Props> = props => (
   <button
@@ -1070,14 +1063,7 @@ const SubmitOrder: React.SFC<Props> = props => (
   />
 )
 
-export const SubmitOrderContainer = createFragmentContainer(
-  SubmitOrder,
-  graphql`
-    fragment SubmitOrder_order on Order {
-      id
-    }
-  `
-)
+export const SubmitOrderContainer = createFragmentContainer(…)
 ```
 
 ----
