@@ -74,21 +74,17 @@ So how _do_ we model errors in such a way that they can be meaningful and in con
 
   - Maybe the failed data is unrelated to other components that you were also requesting data for.
 
-    [TODO: Insert screenshot of page that has a Recently Viewed artwork rail]
+    ![Unrelated component](images/partial-data-unrelated-annotated.png)
 
   - Or the data that failed was part of a list and other entries can still be rendered just fine.
 
-    [TODO: Insert screenshot of artwork grid]
+    ![Partial list data](images/partial-data-list-annotated.png)
 
 * Or what if you’d (additionally) like to communicate the error in your interface?
 
-  - Perhaps you’d want to display that some functionality only works when authorized.
+  - When the query is in response to a mutation and you’d like to communicate input validation failures.
 
-    [TODO: Come up with example on artsy and insert screenshot]
-
-  - Or the query is in response to a mutation and you’d like to communicate input validation failures.
-
-    [TODO: Insert screenshot of order pages]
+    ![Surface validation error](images/mutation-validation-error.png)
 
 ## Possible solutions
 

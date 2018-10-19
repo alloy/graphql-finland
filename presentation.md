@@ -1,6 +1,7 @@
 # Where art thou,
 # my error?
 ### _@alloy - artsy.net_
+#### https://github.com/alloy/graphql-finland
 
 [.background-color: #FFFFFF]
 
@@ -197,7 +198,22 @@
 
 ----
 
+![fit](images/partial-data-unrelated-annotated.png)
+
+^
+- Unrelated components
+
+----
+
 ![fit](images/partial-data-list.png)
+
+^
+- Part of list
+- Others can render fine
+
+----
+
+![fit](images/partial-data-list-annotated.png)
 
 ^
 - Part of list
@@ -210,14 +226,6 @@
 ^
 - What if you want
   to show in UI?
-
-----
-
-![fit](TODO: Come up with example on artsy and insert screenshot)
-
-^
-- Display authz needed
-
 
 ----
 
