@@ -6,5 +6,5 @@ to surface errors that occur during GraphQL query execution, as well as what _ou
 You can find the slides on [Speaker Deck](https://speakerdeck.com/alloy/where-art-thou-my-error) or as PDF in
 [this repo](presentation.pdf).
 
-Finally, you can find a blog post version [here](http://artsy.github.io/blog/2018/10/19/where-art-thou-my-error/), where
+Finally, you can find a recording of the talk [here](https://www.youtube.com/watch?v=qKA-n8p-sNc) and a blog post version [here](http://artsy.github.io/blog/2018/10/19/where-art-thou-my-error/)—where
 you can also leave comments with your feedback on all of this 🙏
